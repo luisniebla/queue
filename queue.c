@@ -19,28 +19,41 @@ struct q_element * NewItem() {
 }
 
 // Add the item queue to the top of the head queue
+// A double linked list doesn't use next at the end
 void AddQueue(struct q_element *head, int item){
   struct q_element* newItem = NewItem();
   newItem->payload = item;
   if (head->next == NULL){
+    newItem->next = NULL;
+    newItem->prev = NULL;
     head->next = newItem;
   }else{
     struct q_element* temp = head->next;
-    head->next = newItem;
+    temp->prev = newItem;
     newItem->next = temp;
+    newItem->prev = NULL;
+    head->next = newItem;
   }
 }
 
+void PrintQueue(struct q_element *head) {
+  struct q_element* temp = head->next;
+  while(temp != NULL) {
+    printf("%d -> ", temp->payload);
+    temp = temp->next;
+  }
+}
 int main(){
   struct q_element *head1;
   struct q_element *head2;
-
+4
   head1 = NewItem();
   head2 = NewItem();
   
   head1->payload = 99;
+  AddQueue(head2, 1);
   AddQueue(head2, 2);
-  printf("%d\n", head1->payload);
-  printf("%d\n", head2->next->payload);
+  AddQueue(head2, 3);
+  PrintQueue(head2);
   return 0;
 }

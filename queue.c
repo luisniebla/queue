@@ -28,15 +28,18 @@ void AddQueue(struct q_element *head, int item){
   struct q_element* newItem = NewItem();
   newItem->payload = item;
   if (head->next == NULL){
-    newItem->next = NULL;
-    newItem->prev = NULL;
+    newItem->next = newItem;
+    newItem->prev = newItem;
     head->next = newItem;
   }else{
-    struct q_element* temp = head->next;
-    temp->prev = newItem;
-    newItem->next = temp;
-    newItem->prev = NULL;
+    struct q_element* prevFirst = head->next;
+    struct q_element* last = head->next->prev;
+    
+    prevFirst->prev = newItem;
+    newItem->next = prevFirst;
+    newItem->prev = last;
     head->next = newItem;
+    last->next = newItem;
   }
   if(DEBUG) {
     printf("Adding %d resulted in queue: ", item);
@@ -46,14 +49,20 @@ void AddQueue(struct q_element *head, int item){
 
 struct q_element* DelQueue(struct q_element *head){
   if (head->next == NULL) {
+    printf("----Tried to delete empty queue---\n");
     return NULL;
   }
+  struct q_element* last = head->next->prev;
   struct q_element* deleteMe = head->next;
-  head->next = deleteMe->next;
-  if (head->next == NULL) {
+  if (deleteMe == deleteMe->next) {
+    head->next = NULL;
+    printf("Deleting resulted in queue: end\n");
     return deleteMe;
   }
-  head->next->prev = NULL;
+  head->next = deleteMe->next;
+  head->next->prev = last;
+  head->next->next = deleteMe->next->next;
+  last->next = head->next;
   if(DEBUG) {
     printf("Deleting resulted in queue: ");
     PrintQueue(head);
@@ -62,13 +71,21 @@ struct q_element* DelQueue(struct q_element *head){
     
 void PrintQueue(struct q_element *head) {
   struct q_element* temp = head->next;
-  while(temp != NULL) {
+  printf("%d -> ", temp->payload);
+  temp = temp->next;
+  while(temp != head->next) {
     printf("%d -> ", temp->payload);
     temp = temp->next;
   }
+  printf("end");
   printf("\n");
 }
 
+void RotateQ(struct q_element *head) {
+  printf("Rotating queue: ");
+  head->next = head->next->next;
+  PrintQueue(head);
+}
 void test_add_queue() {
   struct q_element *head;
 
@@ -84,6 +101,12 @@ void test_add_queue() {
   DelQueue(head);
   DelQueue(head);
   AddQueue(head, 99);
+  AddQueue(head, 1);
+  AddQueue(head, 2);
+  AddQueue(head, 3);
+  RotateQ(head);
+  RotateQ(head);
+  
 }
 
 int main(){

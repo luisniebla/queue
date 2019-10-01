@@ -4,7 +4,7 @@
 #include "q.h"
 
 void test_add_queue() {
-  struct q_element *head;
+  struct TCB_t *head;
 
   head = NewItem();
   AddQueue(head, 1);

@@ -6,35 +6,35 @@
 #define DEBUG 1
 
 // A q-element is a structure with a prev, next, and payload of 1 integer. 
-//struct q_element {
-  //struct q_element* next;
-  //struct q_element* prev;
-  //int payload;
-  //};
+struct q_element {
+  struct q_element* next;
+  struct q_element* prev;
+  int payload;
+};
 
-void PrintQueue(struct TCB_t *);
-// A queue conists of a head pointer and a set of q-elements. This means that a queue is just a pointer to a TCB_h.
+void PrintQueue(struct q_element *);
+// A queue conists of a head pointer and a set of q-elements. This means that a queue is just a pointer to a q_element.
 struct queue {
-  struct TCB_t *head;
+  struct q_element *head;
   
 };
 
-struct TCB_t * NewItem() {
-  return (struct TCB_t *) malloc(sizeof(struct TCB_t));
+struct q_element * NewItem() {
+  return (struct q_element *) malloc(sizeof(struct q_element));
 }
 
 // Add the item queue to the top of the head queue
 // A double linked list doesn't use next at the end
-void AddQueue(struct TCB_t *head, int item){
-  struct TCB_t* newItem = NewItem();
+void AddQueue(struct q_element *head, int item){
+  struct q_element* newItem = NewItem();
   newItem->payload = item;
   if (head->next == NULL){
     newItem->next = newItem;
     newItem->prev = newItem;
     head->next = newItem;
   }else{
-    struct TCB_t* prevFirst = head->next;
-    struct TCB_t* last = head->next->prev;
+    struct q_element* prevFirst = head->next;
+    struct q_element* last = head->next->prev;
     
     prevFirst->prev = newItem;
     newItem->next = prevFirst;
@@ -48,13 +48,13 @@ void AddQueue(struct TCB_t *head, int item){
   }
 }
 
-struct TCB_t* DelQueue(struct TCB_t *head){
+struct q_element* DelQueue(struct q_element *head){
   if (head->next == NULL) {
     printf("----Tried to delete empty queue---\n");
     return NULL;
   }
-  struct TCB_t* last = head->next->prev;
-  struct TCB_t* deleteMe = head->next;
+  struct q_element* last = head->next->prev;
+  struct q_element* deleteMe = head->next;
   if (deleteMe == deleteMe->next) {
     head->next = NULL;
     printf("Deleting resulted in queue: end\n");
@@ -70,8 +70,8 @@ struct TCB_t* DelQueue(struct TCB_t *head){
   }
 }
     
-void PrintQueue(TCB_t *head) {
-  struct TCB_t* temp = head->next;
+void PrintQueue(struct q_element *head) {
+  struct q_element* temp = head->next;
   printf("%d -> ", temp->payload);
   temp = temp->next;
   while(temp != head->next) {
@@ -82,7 +82,7 @@ void PrintQueue(TCB_t *head) {
   printf("\n");
 }
 
-void RotateQ(struct TCB_t *head) {
+void RotateQ(struct q_element *head) {
   printf("Rotating queue: ");
   head->next = head->next->next;
   PrintQueue(head);

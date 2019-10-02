@@ -11,3 +11,15 @@ void start_thread(void (*function) (void))
   AddQueue(RunQ, my_TCB);
 }
 
+void run() {
+  ucontext_t parent;
+  getcontext(&parent);
+  swapcontext(&parent, &(RunQ->context));
+}
+
+void yield() {
+  RotateQ(RunQ);
+  ucontext_t parent;
+  getcontext(&parent);
+  swapcontext(&parent, &(RunQ->context));
+}

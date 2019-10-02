@@ -3,7 +3,7 @@
 #include <assert.h> // assert, obviously
 #include "tcb.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 // A q-element is a structure with a prev, next, and payload of 1 integer. 
 //struct q_element {
@@ -81,7 +81,12 @@ void PrintQueue(TCB_t *head) {
 }
 
 void RotateQ(struct TCB_t *head) {
-  printf("Rotating queue: ");
+  
   head->next = head->next->next;
-  PrintQueue(head);
+  if (DEBUG) {
+    printf("Rotating queue: ");
+    PrintQueue(head);
+    printf("\n");
+  }
+  
 }

@@ -1,4 +1,5 @@
 #include <ucontext.h>
+#include <string.h>
 
 typedef struct TCB_t {
   struct TCB_t *next;
@@ -7,7 +8,7 @@ typedef struct TCB_t {
   int payload;
 } TCB_t;
 
-void init_TCB(TCB_t *tcb, void *function, void *stackP, int stack_size) {
+void init_TCB(TCB_t *tcb, void *function, char *stackP, int stack_size) {
   memset(tcb, '\0', sizeof(TCB_t));
   getcontext(&tcb->context);
   tcb->context.uc_stack.ss_sp = stackP;

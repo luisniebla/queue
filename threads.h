@@ -11,9 +11,6 @@ void start_thread(void (*function) (void))
   struct TCB_t * my_TCB = (struct TCB_t *) malloc(sizeof(struct TCB_t));
   my_TCB->payload = 0;
   init_TCB(my_TCB, function, stackP, 8192);
-  printf("We did it");
-  printf("\n%d\n", my_TCB->payload);
-  printf("\n%d\n", RunQ->payload);
   AddQueue(RunQ, my_TCB);
 }
 

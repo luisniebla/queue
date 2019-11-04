@@ -47,6 +47,10 @@ void AddQueue(struct TCB_t *head, struct TCB_t * newItem){
 }
 
 struct TCB_t* DelQueue(struct TCB_t *head){
+  if (head == NULL) {
+    printf("---Tried to delete queue---");
+    return NULL;
+  }
   if (head->next == NULL) {
     printf("----Tried to delete empty queue---\n");
     return NULL;

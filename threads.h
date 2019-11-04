@@ -3,13 +3,13 @@
 
 extern struct TCB_t * RunQ;
 
-void start_thread(void (*function) (void))
+void start_thread(void (*function) (void), int payload)
 {
   // allocate a stack? 
   
   char * stackP = (char *) malloc(sizeof(char) * 8192);
   struct TCB_t * my_TCB = (struct TCB_t *) malloc(sizeof(struct TCB_t));
-  my_TCB->payload = 0;
+  my_TCB->payload = payload;
   init_TCB(my_TCB, function, stackP, 8192);
   AddQueue(RunQ, my_TCB);
 }
@@ -21,8 +21,8 @@ void run() {
 }
 
 void yield() {
-  RotateQ(RunQ);
-  ucontext_t parent;
+  ucontext_t parent = RunQ->next->context;
   getcontext(&parent);
+  RotateQ(RunQ);
   swapcontext(&parent, &(RunQ->next->context));
 }

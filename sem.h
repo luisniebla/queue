@@ -14,7 +14,9 @@ void InitSem(struct sem * S, int value) {
 
 void P(struct sem * S) {
     S->value--;
-    while(S->value < 0) {yield();}
+    while(S->value < 0) {
+        getcontext(&(RunQ->next->context));
+        yield();}
 }
 
 struct TCB_t * V(struct sem * S) {

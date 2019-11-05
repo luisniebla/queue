@@ -26,9 +26,11 @@ struct TCB_t * NewItem() {
 // Add the item queue to the top of the head queue
 // A double linked list doesn't use next at the end
 void AddQueue(struct TCB_t *head, struct TCB_t * newItem){
+  printf("Here is your newItem %d", newItem->payload);
   if (head->next == NULL){
     newItem->next = newItem;
     newItem->prev = newItem;
+    newItem->payload = newItem->payload;
     head->next = newItem;
   }else{
     struct TCB_t* prevFirst = head->next;
@@ -37,6 +39,7 @@ void AddQueue(struct TCB_t *head, struct TCB_t * newItem){
     prevFirst->prev = newItem;
     newItem->next = prevFirst;
     newItem->prev = last;
+    newItem->payload = newItem->payload;
     head->next = newItem;
     last->next = newItem;
   }
@@ -74,10 +77,10 @@ struct TCB_t* DelQueue(struct TCB_t *head){
     
 void PrintQueue(TCB_t *head) {
   struct TCB_t* temp = head->next;
-  printf("%d -> ", temp->payload);
+  printf("%d has context: %d -> ", temp->payload, &(temp->context));
   temp = temp->next;
   while(temp != head->next) {
-    printf("%d -> ", temp->payload);
+    printf("%d has context: %d -> ", temp->payload, &(temp->context));
     temp = temp->next;
   }
   printf("end");
@@ -85,7 +88,6 @@ void PrintQueue(TCB_t *head) {
 }
 
 void RotateQ(struct TCB_t *head) {
-  
   head->next = head->next->next;
   if (DEBUG) {
     printf("Rotating queue: ");

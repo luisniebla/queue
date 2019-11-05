@@ -52,8 +52,6 @@ void AddQueue(struct TCB_t *head, struct TCB_t * newItem){
     newItem->prev = newItem;
     newItem->payload = newItem->payload;
     head->next = newItem;
-    printf("We out\n");
-    sleep(1);
   }else{
     struct TCB_t* prevFirst = head->next;
     struct TCB_t* last = head->next->prev;

@@ -38,6 +38,7 @@ int last_touched = 0;
 
 void producer_1() {
     while(1) {
+        printf("==This is Producer 1\n");
         P(empty);
         P(mutex);
         put(in++);
@@ -72,6 +73,7 @@ void producer_2() {
 
 void consumer_1() {
     while(1) {
+        printf(">This is consumer 1\n");
         P(full);
         P(mutex);
         int tmp = get();
@@ -79,7 +81,7 @@ void consumer_1() {
         V(empty);
         // buffer--;
         // struct TCB_t * lastTouch = DelQueue(touchedHistory);
-        printf("This is consumer consuming %d\n", tmp);
+        printf(">This is consumer consuming %d\n", tmp);
         // printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
         yield();
     }
@@ -102,9 +104,9 @@ int main() {
     full->queue = NewItem();
     RunQ = NewItem();
     RunQ->payload = 0;
-    start_thread(consumer_1, 2);
+    start_thread(consumer_1, 1);
     start_thread(producer_1, 2);
-    // start_thread(consumer_1, 2);
+    start_thread(consumer_1, 3);
     // start_thread(consumer_1, 2);
     // start_thread(producer_1, 2);
     // start_thread(producer_1, 2);

@@ -17,11 +17,9 @@ void P(struct sem * S) {
     while(S->value < 0) {
         yield();
     }
-    printf("Freed from P\n");
 }
 
 struct TCB_t * V(struct sem * S) {
-    printf("Entering V\n");
     struct TCB_t * newRunner;
     S->value++;
     if (S->value <= 0) {
@@ -30,6 +28,5 @@ struct TCB_t * V(struct sem * S) {
         // AddQueue(RunQ, DelQueue(S->queue)); // take out element
         // PrintQueue(RunQ);
     }
-    printf("Finished with V\n");
     yield();
 }

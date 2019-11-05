@@ -19,13 +19,12 @@ void run() {
 int yield() {
   ucontext_t * parent_child = &(RunQ->next->context);
   RotateQ(RunQ);
+  // printf("We're going to swap from %d to %d\n", parent_child, &(RunQ->next->context));
   
-  printf("We're going to swap from %d to %d\n", parent_child, &(RunQ->next->context));
-  
-  sleep(2);
+  // sleep(1);
   // if ()
   printf("Swapping Now\n");
-  printf("Swap Context Returned: %d", swapcontext(parent_child, &(RunQ->next->context)));
+  printf("Swap Context Returned: %d\n", swapcontext(parent_child, &(RunQ->next->context)));
 }
 
 // matthew 

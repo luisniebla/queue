@@ -15,8 +15,9 @@ void InitSem(struct sem * S, int value) {
 void P(struct sem * S) {
     S->value--;
     while(S->value < 0) {
-        getcontext(&(RunQ->next->context));
-        yield();}
+        yield();
+    }
+    printf("Freed from P\n");
 }
 
 struct TCB_t * V(struct sem * S) {
@@ -26,11 +27,9 @@ struct TCB_t * V(struct sem * S) {
     if (S->value <= 0) {
         // Take PCB out of semaphore queue and put it into run queue
         printf("Adding to queue\n");
-        AddQueue(RunQ, DelQueue(S->queue)); // take out element
-        PrintQueue(RunQ);
+        // AddQueue(RunQ, DelQueue(S->queue)); // take out element
+        // PrintQueue(RunQ);
     }
     printf("Finished with V\n");
-    // yield();
     yield();
-    printf("-------Return from Yield-------");
 }

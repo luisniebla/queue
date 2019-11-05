@@ -23,6 +23,27 @@ struct TCB_t * NewItem() {
   return (struct TCB_t *) malloc(sizeof(struct TCB_t));
 }
 
+void AddToQueue(struct TCB_t *head, struct TCB_t * newItem){
+  if (head->next == NULL){
+    newItem->payload = newItem->payload;
+    head->next = newItem;
+  }else{
+    struct TCB_t* prevFirst = head->next;
+    struct TCB_t* last = head->next->prev;
+    
+    prevFirst->prev = newItem;
+    newItem->next = prevFirst;
+    newItem->prev = last;
+    newItem->payload = newItem->payload;
+    head->next = newItem;
+    last->next = newItem;
+  }
+  if(DEBUG) {
+    printf("Adding %d resulted in queue: ", newItem->payload);
+    PrintQueue(head);
+  }
+}
+
 // Add the item queue to the top of the head queue
 // A double linked list doesn't use next at the end
 void AddQueue(struct TCB_t *head, struct TCB_t * newItem){
@@ -31,6 +52,8 @@ void AddQueue(struct TCB_t *head, struct TCB_t * newItem){
     newItem->prev = newItem;
     newItem->payload = newItem->payload;
     head->next = newItem;
+    printf("We out\n");
+    sleep(1);
   }else{
     struct TCB_t* prevFirst = head->next;
     struct TCB_t* last = head->next->prev;
@@ -72,6 +95,7 @@ struct TCB_t* DelQueue(struct TCB_t *head){
     printf("Deleting resulted in queue: ");
     PrintQueue(head);
   }
+  return deleteMe;
 }
     
 void PrintQueue(TCB_t *head) {

@@ -2,7 +2,7 @@
 
 struct TCB_t * RunQ;
 struct TCB_t * touchedHistory;
-
+#define DEBUG 0 
 ucontext_t uctx_main;
 ucontext_t parent;
 struct sem * empty;
@@ -49,7 +49,8 @@ void producer_1() {
         // AddQueue(touchedHistory, thisRecord);
         // PrintQueue(touchedHistory);
         printf("This is producer producing item number %d\n", in - 1);
-        printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
+        if (DEBUG) printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
+        // PrintQueue(RunQ);
         yield();
     }
 }
@@ -73,7 +74,7 @@ void producer_2() {
 
 void consumer_1() {
     while(1) {
-        // printf(">Entering consumer %d\n", RunQ->next->payload);
+        if (DEBUG) printf(">Entering consumer %d\n", RunQ->next->payload);
         P(full);
         P(mutex);
         int tmp = get();
@@ -83,7 +84,7 @@ void consumer_1() {
         // struct TCB_t * lastTouch = DelQueue(touchedHistory);
         printf(">This is consumer %d consuming %d\n", RunQ->next->payload, tmp);
         // printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
-        sleep(1);
+        // sleep(1);
         yield();
     }
 }

@@ -3,7 +3,7 @@
 
 extern struct TCB_t * RunQ;
 #include <string.h>
-
+#define DEBUG 0
 typedef struct sem {
   struct TCB_t *queue;
   int value;
@@ -11,17 +11,20 @@ typedef struct sem {
 } sem;
 
 void InitSem(struct sem * S, int value, char str[]) {
-    printf("initializing to %d\n", value);
+    // printf("initializing to %d\n", value);
     S->value = value;
-    printf("here is yuor proof %d\n", S->value);
+    // printf("here is yuor proof %d\n", S->value);
     S->label = str;
 }
 
 void PrintSem(struct sem * S) {
-    printf("\n====S=======\n");
+    if (DEBUG) {
+printf("\n====S=======\n");
     printf("|label: %s|\n", S->label);
     printf("|value: %d  |\n", S->value);
     printf("==========\n");
+    }
+    
 }
 void P(struct sem * S) {
     // PrintSem(S);
@@ -31,7 +34,7 @@ void P(struct sem * S) {
         // PrintSem(S);
         struct TCB_t * newItem = DelQueue(RunQ);
         if (newItem == NULL){
-            printf("TRIED TO DELETE EMPTY RUNQ\n");
+            if (DEBUG) printf("TRIED TO DELETE EMPTY RUNQ\n");
         }else{
             newItem->next = NULL;
             newItem->prev = NULL;
@@ -60,13 +63,25 @@ struct TCB_t * V(struct sem * S) {
     // printf(">>>>%d\n", S->value);
     if (S->value <= 0) {
         // Take PCB out of semaphore queue and put it into run queue
-        // printf("Adding to queue\n");
+        // printf("Removing from queue\n");
+        
+        // PrintQueue(S->queue);
         struct TCB_t * newItem = DelQueue(S->queue);
+        // printf("WE DELETED SUCCESFFULLY\n");
+        // PrintQueue(S->queue);
         newItem->next = NULL;
         newItem->prev = NULL;
+        // printf("RETRIEVING NEXT ITEM\n");
+        struct TCB_t * currentItem = RunQ->next;
+        // printf("WERE GOING TO ADD TO QUEU\n");
         AddQueue(RunQ, newItem); // take out element
+        // printf("RunQ:\n");
         // PrintQueue(RunQ);
-        yield();
+        // PrintQueue(RunQ);
+        // printf("V is yielding\n");
+        // printf("Payload: %d\n", RunQ->next->payload);
+        // yield();
+        yield_from(currentItem);
     }
     
 }

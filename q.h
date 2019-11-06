@@ -101,14 +101,17 @@ struct TCB_t* DelQueue(struct TCB_t *head){
 }
     
 void PrintQueue(TCB_t *head) {
-  struct TCB_t* temp = head->next;
-  printf("%d has context: %d -> ", temp->payload, &(temp->context));
-  temp = temp->next;
-  while(temp != head->next) {
+  if (head != NULL && head->next != NULL) {
+    struct TCB_t* temp = head->next;
     printf("%d has context: %d -> ", temp->payload, &(temp->context));
     temp = temp->next;
+    while(temp != head->next) {
+      printf("%d has context: %d -> ", temp->payload, &(temp->context));
+      temp = temp->next;
+    }
+  
   }
-  printf("end");
+  printf("end of queue");
   printf("\n");
 }
 

@@ -15,15 +15,21 @@ int fill = 0;
 int use = 0;
 
 void put(int value) {
-    buff[fill] = value;
     if (buff[fill] != 0){
-        // printf("=====Fuckedup=====\n");
+        printf("=====ERROR PRODUCED AT NON A NULL VALUE=====\n");
+        sleep(3);
     }
+    buff[fill] = value;
+    
     fill = (fill + 1) % 6;
 }
 
 int get() {
     int tmp = buff[use];
+    if (tmp == 0) {
+        printf("=======ERROR AT A NON NULL VALUE=====\n");
+        sleep(4);
+    }
     buff[use] = 0;
     use = (use + 1) % 6;
     return tmp;
@@ -49,7 +55,7 @@ void producer_1() {
         // AddQueue(touchedHistory, thisRecord);
         // PrintQueue(touchedHistory);
         printf("This is producer producing item number %d\n", in - 1);
-        if (DEBUG) printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
+        printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
         // PrintQueue(RunQ);
         yield();
     }
@@ -66,8 +72,8 @@ void producer_2() {
         AddQueue(touchedHistory, thisRecord);
         // PrintQueue(touchedHistory);
         printf("This is producer 2 producing item number %d\n", in - 1);
-        // printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
-        sleep(1);
+        printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
+        
         yield();
     }
 }
@@ -83,7 +89,7 @@ void consumer_1() {
         // buffer--;
         // struct TCB_t * lastTouch = DelQueue(touchedHistory);
         printf(">This is consumer %d consuming %d\n", RunQ->next->payload, tmp);
-        // printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
+        printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
         // sleep(1);
         yield();
     }
@@ -110,6 +116,12 @@ int main() {
     RunQ->payload = 0;
     start_thread(consumer_1, 1);
     start_thread(producer_1, 2);
+    start_thread(producer_1, 2);
+    start_thread(producer_1, 2);
+    start_thread(producer_1, 2);
+    start_thread(producer_1, 2);
+    start_thread(producer_1, 2);
+
     start_thread(consumer_1, 3);
     // start_thread(consumer_1, 2);
     // start_thread(producer_1, 2);

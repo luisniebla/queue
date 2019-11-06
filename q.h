@@ -47,6 +47,10 @@ void AddToQueue(struct TCB_t *head, struct TCB_t * newItem){
 // Add the item queue to the top of the head queue
 // A double linked list doesn't use next at the end
 void AddQueue(struct TCB_t *head, struct TCB_t * newItem){
+  if (head == NULL || newItem == NULL) {
+    printf("TRIED TO ADD NULL HEAD");
+    return;
+  }
   if (head->next == NULL){
     newItem->next = newItem;
     newItem->prev = newItem;
@@ -82,7 +86,7 @@ struct TCB_t* DelQueue(struct TCB_t *head){
   struct TCB_t* deleteMe = head->next;
   if (deleteMe == deleteMe->next) {
     head->next = NULL;
-    printf("Deleting resulted in queue: end\n");
+    if (DEBUG) printf("Deleting resulted in queue: end\n");
     return deleteMe;
   }
   head->next = deleteMe->next;

@@ -38,7 +38,7 @@ int last_touched = 0;
 
 void producer_1() {
     while(1) {
-        printf("==This is Producer 1\n");
+        // printf("==This is Producer 1\n");
         P(empty);
         P(mutex);
         put(in++);
@@ -48,10 +48,9 @@ void producer_1() {
         // thisRecord->payload = 1;
         // AddQueue(touchedHistory, thisRecord);
         // PrintQueue(touchedHistory);
-        printf("This is producer producing item number %d\n", in);
-        // printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
+        printf("This is producer producing item number %d\n", in - 1);
+        printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
         yield();
-        
     }
 }
 void producer_2() {
@@ -64,16 +63,17 @@ void producer_2() {
         struct TCB_t * thisRecord = NewItem();
         thisRecord->payload = 2;
         AddQueue(touchedHistory, thisRecord);
-        PrintQueue(touchedHistory);
+        // PrintQueue(touchedHistory);
         printf("This is producer 2 producing item number %d\n", in - 1);
         // printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
+        sleep(1);
         yield();
     }
 }
 
 void consumer_1() {
     while(1) {
-        printf(">This is consumer 1\n");
+        // printf(">Entering consumer %d\n", RunQ->next->payload);
         P(full);
         P(mutex);
         int tmp = get();
@@ -81,8 +81,9 @@ void consumer_1() {
         V(empty);
         // buffer--;
         // struct TCB_t * lastTouch = DelQueue(touchedHistory);
-        printf(">This is consumer consuming %d\n", tmp);
+        printf(">This is consumer %d consuming %d\n", RunQ->next->payload, tmp);
         // printf("out: %d %d %d %d %d %d\n", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
+        sleep(1);
         yield();
     }
 }
@@ -90,17 +91,19 @@ void consumer_1() {
 int main() {
     tcb_buff = NewItem();
     out = 0;
-    in = 0;
+    in = 1;
     touchedHistory = NewItem();
     touchedHistory->payload = 0;
     empty = (struct sem *) malloc(sizeof(struct sem));
     mutex = (struct sem *) malloc(sizeof(struct sem));
     full = (struct sem *) malloc(sizeof(struct sem));
-    InitSem(empty, 9);
+    InitSem(empty, 6, "empty");
     empty->queue = NewItem();
-    InitSem(mutex, 1);
+    InitSem(mutex, 1, "mutex");
     mutex->queue = NewItem();
-    InitSem(full, 0);
+    InitSem(full, 0, "full");
+    printf("did it work %d\n", mutex->value);
+    PrintSem(full);
     full->queue = NewItem();
     RunQ = NewItem();
     RunQ->payload = 0;

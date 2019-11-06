@@ -19,17 +19,23 @@ void run() {
 int yield() {
   ucontext_t * parent_child = &(RunQ->next->context);
   RotateQ(RunQ);
-  printf("We're going to swap from %d to %d\n", parent_child, &(RunQ->next->context));
+  // printf("We're going to swap from %d to %d\n", parent_child, &(RunQ->next->context));
   // 
+  // PrintQueue(RunQ);
   // printf("Swap Context Returned: %d\n", swapcontext(parent_child, &(RunQ->next->context)));
-  if (parent_child == &(RunQ->next->context)) {
-    return;
-  }else{
-    swapcontext(parent_child, &(RunQ->next->context));
-  }
+  // if (parent_child == &(RunQ->next->context)) {
+  //   return;
+  // }else{
+    
+  // }
   
 }
 
+int yield_from(TCB_t * parent) {
+  // printf("=========Context Switch => Payload %d: %d > Payload %d: %d\n", parent->payload, &(parent->context), RunQ->next->payload, &(RunQ->next->context));
+  swapcontext(&(parent->context), &(RunQ->next->context));
+  
+}
 // matthew 
 // labs something
 // Fill a position of a React developer and calling in people for interviews

@@ -3,13 +3,14 @@
 
 extern struct TCB_t * RunQ;
 extern struct ucontext_t parent;
-void start_thread(void (*function) (void), int payload)
+void start_thread(void (*function) (void), int payload, char * output_string)
 {
   char * stackP = (char *) malloc(sizeof(char) * 8192);
   struct TCB_t * my_TCB = (struct TCB_t *) malloc(sizeof(struct TCB_t));
   init_TCB(my_TCB, function, stackP, 8192);
   my_TCB->payload = payload;
-  AddQueue(RunQ, my_TCB);
+  my_TCB->identifier = output_string;
+  AddToEnd(RunQ, my_TCB);
 }
 
 void run() {

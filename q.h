@@ -23,26 +23,7 @@ struct TCB_t * NewItem() {
   return (struct TCB_t *) malloc(sizeof(struct TCB_t));
 }
 
-void AddToQueue(struct TCB_t *head, struct TCB_t * newItem){
-  if (head->next == NULL){
-    newItem->payload = newItem->payload;
-    head->next = newItem;
-  }else{
-    struct TCB_t* prevFirst = head->next;
-    struct TCB_t* last = head->next->prev;
-    
-    prevFirst->prev = newItem;
-    newItem->next = prevFirst;
-    newItem->prev = last;
-    newItem->payload = newItem->payload;
-    head->next = newItem;
-    last->next = newItem;
-  }
-  if(DEBUG) {
-    printf("Adding %d resulted in queue: ", newItem->payload);
-    PrintQueue(head);
-  }
-}
+
 
 // Add the item queue to the top of the head queue
 // A double linked list doesn't use next at the end
@@ -72,7 +53,10 @@ void AddQueue(struct TCB_t *head, struct TCB_t * newItem){
     PrintQueue(head);
   }
 }
-
+void AddToEnd(struct TCB_t *head, struct TCB_t * newItem){
+  AddQueue(head, newItem);
+  head->next = head->next->next;
+}
 struct TCB_t* DelQueue(struct TCB_t *head){
   if (head == NULL) {
     printf("---Tried to delete queue---");
@@ -103,10 +87,10 @@ struct TCB_t* DelQueue(struct TCB_t *head){
 void PrintQueue(TCB_t *head) {
   if (head != NULL && head->next != NULL) {
     struct TCB_t* temp = head->next;
-    printf("%d has context: %d -> ", temp->payload, &(temp->context));
+    printf("%s has context: %d -> ", temp->identifier, &(temp->context));
     temp = temp->next;
     while(temp != head->next) {
-      printf("%d has context: %d -> ", temp->payload, &(temp->context));
+      printf("%s has context: %d -> ", temp->identifier, &(temp->context));
       temp = temp->next;
     }
   

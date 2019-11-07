@@ -3,7 +3,7 @@
 
 extern struct TCB_t * RunQ;
 #include <string.h>
-#define DEBUG 1
+#define DEBUG 0
 typedef struct sem {
   struct TCB_t *queue;
   int value;
@@ -27,46 +27,62 @@ printf("\n====S=======\n");
     
 }
 void P(struct sem * S) {
-    S->value--;
-    // printf("P(S) incrementing S\n");
     // PrintSem(S);
+    S->value--;
     if (S->value < 0) {
-        struct TCB_t * currentItem = DelQueue(RunQ);
-        currentItem->next = NULL;
-        currentItem->prev = NULL;
-        AddQueue(S->queue, currentItem);
-        // yield_from(currentItem);
+        // printf(">P(S) inner loop\n");
+        // PrintSem(S);
+        struct TCB_t * newItem = DelQueue(RunQ);
+        if (newItem == NULL){
+            if (DEBUG) printf("TRIED TO DELETE EMPTY RUNQ\n");
+        }else{
+            newItem->next = NULL;
+            newItem->prev = NULL;
+            AddQueue(S->queue, newItem);
+        }
+        
+        // printf("RunQ\n");
+        // PrintQueue(RunQ);
+        // printf("Queue:\n");
+        // PrintQueue(S->queue);
+        // printf("S->value: %d\n", newItem->payload);
         while (S->value < 0) {
-            printf("%s is waiting\n", currentItem->identifier);
+            printf("%s is waiting\n", newItem->identifier);
             // PrintSem(S);
-            // printf("P(S) RunQueue\n");
-            // PrintQueue(RunQ);
-            // sleep(1);
             RotateQ(RunQ);
-            yield_from(currentItem);
+            yield_from(newItem);
             // RotateQ(RunQ);
+            // setcontext(&(RunQ->next->context));
             // sleep(1);
-            // wait();
         }
     }
 }
 
 struct TCB_t * V(struct sem * S) {
+    struct TCB_t * newRunner;
     S->value++;
-    // printf("V(S) is incrementing S\n");
-    // PrintSem(S);
+    // printf(">>>V(S)\n");
+    // printf(">>>>%d\n", S->value);
     if (S->value <= 0) {
         // Take PCB out of semaphore queue and put it into run queue
-        // printf("V prints queue\n");
+        // printf("Removing from queue\n");
+        
         // PrintQueue(S->queue);
         struct TCB_t * newItem = DelQueue(S->queue);
+        // printf("WE DELETED SUCCESFFULLY\n");
+        // PrintQueue(S->queue);
         newItem->next = NULL;
         newItem->prev = NULL;
+        // printf("RETRIEVING NEXT ITEM\n");
         struct TCB_t * currentItem = RunQ->next;
-        AddQueue(RunQ, newItem); 
-        // printf("V printing modified RunQ\n");
+        // printf("WERE GOING TO ADD TO QUEU\n");
+        AddQueue(RunQ, newItem); // take out element
+        // printf("RunQ:\n");
         // PrintQueue(RunQ);
-        // RotateQ(RunQ);
+        // PrintQueue(RunQ);
+        // printf("V is yielding\n");
+        // printf("Payload: %d\n", RunQ->next->payload);
+        // yield();
         yield_from(currentItem);
     }
     

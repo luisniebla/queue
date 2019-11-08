@@ -104,8 +104,6 @@ int main() {
     InitSem(mutex, 1, "mutex");
     mutex->queue = NewItem();
     InitSem(full, 0, "full");
-    printf("did it work %d\n", mutex->value);
-    PrintSem(full);
     full->queue = NewItem();
     RunQ = NewItem();
     RunQ->payload = 0;

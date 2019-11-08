@@ -29,6 +29,7 @@ printf("\n====S=======\n");
 void P(struct sem * S) {
     // PrintSem(S);
     S->value--;
+    PrintSem(S);
     if (S->value < 0) {
         // printf(">P(S) inner loop\n");
         // PrintSem(S);
@@ -40,14 +41,19 @@ void P(struct sem * S) {
             newItem->prev = NULL;
             AddQueue(S->queue, newItem);
         }
-        
+        // printf("======%s\n", newItem->identifier);
         // printf("RunQ\n");
         // PrintQueue(RunQ);
         // printf("Queue:\n");
         // PrintQueue(S->queue);
-        // printf("S->value: %d\n", newItem->payload);
+        if (DEBUG) printf("S->value: %d\n", newItem->payload);
+        // sleep(1);
+        // If we're at parity with consumers and producers, we should only see this a
+        printf("%s is waiting\n", newItem->identifier);
+        yield_from(newItem);
+        // sleep(1);
         while (S->value < 0) {
-            printf("%s is waiting\n", newItem->identifier);
+            
             // PrintSem(S);
             RotateQ(RunQ);
             yield_from(newItem);
@@ -65,9 +71,9 @@ struct TCB_t * V(struct sem * S) {
     // printf(">>>>%d\n", S->value);
     if (S->value <= 0) {
         // Take PCB out of semaphore queue and put it into run queue
-        // printf("Removing from queue\n");
+        printf("Removing from queue\n");
         
-        // PrintQueue(S->queue);
+        PrintQueue(S->queue);
         struct TCB_t * newItem = DelQueue(S->queue);
         // printf("WE DELETED SUCCESFFULLY\n");
         // PrintQueue(S->queue);

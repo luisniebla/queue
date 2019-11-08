@@ -1,3 +1,5 @@
+// Luis Guillermo Niebla Rios
+
 #include "sem.h"
 
 struct TCB_t * RunQ;

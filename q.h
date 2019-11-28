@@ -106,5 +106,4 @@ void RotateQ(struct TCB_t *head) {
     PrintQueue(head);
     printf("\n");
   }
-  
 }

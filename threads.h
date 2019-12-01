@@ -38,17 +38,3 @@ int yield_from(TCB_t * parent) {
   swapcontext(&(parent->context), &(RunQ->next->context));
   
 }
-// matthew 
-// labs something
-// Fill a position of a React developer and calling in people for interviews
-// React.js developer
-// Downtown area
-// Basic interview, get a sense of technical qualifications
-// A few questions, React component lifecycle in async enviornment
-  // Their application is 100% react material 
-  // Model View Controller in terms of react lifecycle with constructor.
-  // Redux stuff
-// Wednesday Morning
-  // 9 AM - 
-// Thursday Morning at 9 AM
-// Redux forms are include

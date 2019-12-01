@@ -8,7 +8,7 @@ struct TCB_t * touchedHistory;
 ucontext_t uctx_main;
 ucontext_t parent;
 struct sem * resource;
-struct sem * mutex;
+// struct sem * mutex;
 int buffer;
 struct TCB_t * tcb_buff;
 int buff[5];
@@ -19,57 +19,87 @@ int readcount = 0;
 int readerID = 0;
 int writerID = 0;
 
-void put(int value) {
-    // if (buff[fill] != 0){
-    //     printf("=====ERROR PRODUCED AT NON A NULL VALUE=====\n");
-    //     sleep(3);
-    // }
-    struct TCB_t * thisRecord = NewItem();
-    thisRecord->identifier = RunQ->next->identifier;
-    AddToEnd(touchedHistory, thisRecord);
-    // printf("Touched history\n");
-    // PrintQueue(touchedHistory);
-    // buff[fill] = value;
-    
-    // fill = (fill + 1) % 6;
+typedef struct _rwlock_t {
+    struct sem * writelock;
+    struct sem * lock;
+    int readers;
+} rwlock_t;
+
+rwlock_t mutex;
+
+// The concept for these rwlock_* functions comes from OS: 3 Easy Pieces.
+// We modify the internals to work with our semlocks instead of C pthreads
+void rwlock_init(rwlock_t * lock) {
+    lock->readers = 0;
+    lock->lock = (struct sem *) malloc(sizeof(struct sem));
+    lock->writelock = (struct sem *) malloc(sizeof(struct sem));
+    InitSem((lock->lock), 1, "lock");
+    InitSem((lock->writelock), 1, "writelock"); 
 }
 
-TCB_t * get() {
-    TCB_t *head = DelQueue(touchedHistory);
-    return head;
-};
+void rwlock_acquire_readlock(rwlock_t *lock) {
+    P(lock->lock);
+    lock->readers++;
+    if (lock->readers == 1)
+        P(lock->writelock);
+    V(lock->lock);
+}
+
+void rwlock_release_readlock(rwlock_t *lock) {
+    P(lock->lock);
+    lock->readers--;
+    if (lock->readers == 0){
+        printf("realeasing writelock\n");
+        V(lock->writelock);
+    }
+       
+    V(lock->lock);
+}
+
+void rwlock_acquire_writelock(rwlock_t *lock) {
+    P(lock->writelock);
+}
+
+void rwlock_release_writelock(rwlock_t *lock) {
+    V(lock->writelock);
+}
 
 int out;
 
 int item;
 int last_touched = 0;
-
+int counter = 0;
 
 
 void writer() {
     writerID++;
-    P(resource);
-    printf("This is the %d th writer writing value i = %d\n", writerID, i );
-    V(resource);
-    printf("This is the %d th w­riter verifying value i = %dn", writerID, i );
+    int i;
+    rwlock_acquire_writelock(&mutex);
+    counter++;
+    printf("This is the %dth writer writing value i = %d\n", writerID, counter);
     yield();
+    rwlock_release_writelock(&mutex);
+    yield();
+    printf("This is the %dth writer verifying value i = %d\n", writerID, counter);
+    // return NULL;
+    // yield();
 }
 
 void reader() {
-    readerID++;
-    P(mutex);
-    readcount++;          //Indicate that you are a reader trying to enter the Critical Section
-    if (readcount == 1)   //Checks if you are the first reader trying to enter CS
-        P(resource);
-    V(mutex);
-    // Read the variable value and print the current value
-    printf("This is the %d th reader reading value i = %d for the first time\n", readerID, i );
-    P(mutex);
-    readcount--;
-    if (readcount == 0)
-        V(resource);
-    V(mutex);
-    printf("This is the %d th reader reading value i = %d for the second time\n", readerID, i );
+    // readerID++;
+    int i;
+    int local = 0;
+    int localReaderID = ++readerID;
+    // for (i = 0; i < 1; i++) {
+    rwlock_acquire_readlock(&mutex);
+    local = counter;
+    printf("This is the %dth reader reading value i = %d for the first time\n", localReaderID, counter );
+    rwlock_release_readlock(&mutex);
+    yield();
+    local = counter;
+    printf("This is the %dth reader reading value i = %d for the second time\n", localReaderID, counter );
+
+    // return NULL;
     yield();
 }
 
@@ -82,17 +112,10 @@ void generate_threads(void (*function) (void), int payload, char * str, int thre
 int main() {
     tcb_buff = NewItem();
     out = 0;
-    touchedHistory = NewItem();
-    touchedHistory->payload = 0;
-    mutex = (struct sem *) malloc(sizeof(struct sem));
-    resource = (struct sem *) malloc(sizeof(struct sem));
-    InitSem(resource, 1, "resource");
-    resource->queue = NewItem();
-    InitSem(mutex, 1, "mutex");
-    mutex->queue = NewItem();
     RunQ = NewItem();
     RunQ->payload = 0;
-
+    // mutex = return (struct TCB_t *) malloc(sizeof(struct TCB_t));
+    rwlock_init(&mutex); 
     generate_threads(reader, 1, "Reader", 5);
     generate_threads(writer, 1, "Writer", 1);
     generate_threads(reader, 6, "Reader", 4);

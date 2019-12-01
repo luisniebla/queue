@@ -4,7 +4,7 @@
 
 struct TCB_t * RunQ;
 struct TCB_t * touchedHistory;
-#define DEBUG 0 
+#define DEBUG 0
 ucontext_t uctx_main;
 ucontext_t parent;
 struct sem * resource;
@@ -31,7 +31,9 @@ rwlock_t mutex;
 void rwlock_init(rwlock_t * lock) {
     lock->readers = 0;
     lock->lock = (struct sem *) malloc(sizeof(struct sem));
+    lock->lock->queue = NewItem();
     lock->writelock = (struct sem *) malloc(sizeof(struct sem));
+    lock->writelock->queue = NewItem();
     InitSem((lock->lock), 1, "lock");
     InitSem((lock->writelock), 1, "writelock"); 
 }
@@ -40,7 +42,7 @@ void rwlock_acquire_readlock(rwlock_t *lock) {
     P(lock->lock);
     lock->readers++;
     if (lock->readers == 1) {
-        printf("Locking writelock\n");
+        if(DEBUG) printf("Locking writelock\n");
         P(lock->writelock);
     }
     V(lock->lock);
@@ -49,8 +51,9 @@ void rwlock_acquire_readlock(rwlock_t *lock) {
 void rwlock_release_readlock(rwlock_t *lock) {
     P(lock->lock);
     lock->readers--;
+    if (DEBUG) printf("lock->readers: %d\n", lock->readers);
     if (lock->readers == 0){
-        // printf("releasing writelock\n");
+        if(DEBUG) printf("**********releasing writelock\n");
         V(lock->writelock);
     }
        
@@ -73,6 +76,7 @@ int counter = 0;
 
 
 void writer() {
+    if(DEBUG) printf("====>Writer\n");
     writerID++;
     int i;
     rwlock_acquire_writelock(&mutex);
@@ -87,6 +91,8 @@ void writer() {
 }
 
 void reader() {
+    if(DEBUG)printf("=====>Reader\n");
+    ucontext_t thisContext = (RunQ->next->context);
     // readerID++;
     int i;
     int local = 0;
@@ -99,9 +105,24 @@ void reader() {
     
     local = counter;
     printf("This is the %dth reader reading value i = %d for the second time\n", localReaderID, counter );
-
+    if(DEBUG) printf("Finished with this reader. What's next?\n");
+    if (DEBUG) PrintQueue(RunQ);
     // return NULL;
-    yield();
+    // getcontext(&(RunQ->next->context));
+    
+    // This is to catch the case where V was called and we have a writer as the head
+    // if (&(RunQ->next->context) != &thisContext) {
+    //     if (DEBUG) printf("thisContext: %d\n", &thisContext);
+    //     if(DEBUG) PrintQueue(RunQ);
+    //     swapcontext(&thisContext, &(RunQ->next->context));
+    //     DelQueue(RunQ);
+    // }else{
+    if (DEBUG) printf("Yielding is next\n");
+    if(DEBUG) PrintQueue(RunQ);
+    DelQueue(RunQ);
+    if (DEBUG) PrintQueue(RunQ);
+    yield_from(&parent);
+    
 }
 
 void generate_threads(void (*function) (void), int payload, char * str, int threads) 

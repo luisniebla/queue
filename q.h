@@ -29,7 +29,7 @@ struct TCB_t * NewItem() {
 // A double linked list doesn't use next at the end
 void AddQueue(struct TCB_t *head, struct TCB_t * newItem){
   if (head == NULL || newItem == NULL) {
-    printf("TRIED TO ADD NULL HEAD");
+    printf("TRIED TO ADD NULL HEAD. You must've forgotten to initialize the head pointer\n");
     return;
   }
   if (head->next == NULL){
@@ -87,10 +87,10 @@ struct TCB_t* DelQueue(struct TCB_t *head){
 void PrintQueue(TCB_t *head) {
   if (head != NULL && head->next != NULL) {
     struct TCB_t* temp = head->next;
-    printf("%s -> ", temp->identifier);
+    printf("%s (%d) -> ", temp->identifier, &temp->context);
     temp = temp->next;
     while(temp != head->next) {
-      printf("%s -> ", temp->identifier);
+      printf("%s (%d) -> ", temp->identifier, &temp->context);
       temp = temp->next;
     }
   

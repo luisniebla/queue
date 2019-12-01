@@ -29,10 +29,10 @@ printf("\n====S=======\n");
     
 }
 void P(struct sem * S) {
-    // PrintSem(S);
+    
     if (DEBUG) printf("======>P\n");
     S->value--;
-    // PrintSem(S);
+    if(DEBUG) PrintSem(S);
     if (S->value < 0) {
         // printf(">P(S) inner loop\n");
         // PrintSem(S);

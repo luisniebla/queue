@@ -21,6 +21,7 @@ int writerID = 0;
 typedef struct _rwlock_t {
     struct sem * writelock;
     struct sem * lock;
+    struct sem * readlock;
     int readers;
 } rwlock_t;
 
@@ -32,13 +33,17 @@ void rwlock_init(rwlock_t * lock) {
     lock->readers = 0;
     lock->lock = (struct sem *) malloc(sizeof(struct sem));
     lock->lock->queue = NewItem();
+    lock->readlock = (struct sem *) malloc(sizeof(struct sem));
+    lock->readlock->queue = NewItem();
     lock->writelock = (struct sem *) malloc(sizeof(struct sem));
     lock->writelock->queue = NewItem();
     InitSem((lock->lock), 1, "lock");
     InitSem((lock->writelock), 1, "writelock"); 
+    InitSem((lock->readlock), 1, "readlock");
 }
 
 void rwlock_acquire_readlock(rwlock_t *lock) {
+    P(lock->readlock);
     P(lock->lock);
     lock->readers++;
     if (lock->readers == 1) {
@@ -46,6 +51,7 @@ void rwlock_acquire_readlock(rwlock_t *lock) {
         P(lock->writelock);
     }
     V(lock->lock);
+    V(lock->readlock);
 }
 
 void rwlock_release_readlock(rwlock_t *lock) {
@@ -56,15 +62,17 @@ void rwlock_release_readlock(rwlock_t *lock) {
         if(DEBUG) printf("**********releasing writelock\n");
         V(lock->writelock);
     }
-       
     V(lock->lock);
 }
 
 void rwlock_acquire_writelock(rwlock_t *lock) {
+    // Writer signifying it wants to write, preventing new readers from entering
+    P(lock->readlock);
     P(lock->writelock);
 }
 
 void rwlock_release_writelock(rwlock_t *lock) {
+    V(lock->readlock);
     V(lock->writelock);
 }
 
@@ -88,7 +96,16 @@ void writer() {
     printf("This is the %dth writer verifying value i = %d\n", writerID, counter);
     // return NULL;
     // yield();
-}
+    rwlock_t *lock = &mutex;
+    DelQueue(RunQ); // Delete this writer from the queue
+    while(lock->readlock->queue->next != NULL){
+        if(DEBUG) PrintQueue(RunQ);
+        // We do this here instead of V() because it inserts the readers in the wrong order
+        AddQueue(RunQ, DelQueue(lock->readlock->queue));
+        lock->readlock->value++;
+    }
+    yield_from(&parent);
+}       
 
 void reader() {
     if(DEBUG)printf("=====>Reader\n");
@@ -140,13 +157,14 @@ int main() {
     rwlock_init(&mutex); 
     generate_threads(reader, 1, "Reader", 5);
     generate_threads(writer, 1, "Writer", 1);
+    generate_threads(reader, 6, "Reader", 4);
     // getcontext(&parent);
     // run();
     // 
     // printf("Printing Queue\n");
     // PrintQueue(RunQ);
     run();
-    // generate_threads(reader, 6, "Reader", 4);
+    
     // generate_threads(writer, 2, "Writer", 2);
     // generate_threads(reader, 11, "Reader", 5);
     // generate_threads(writer, 4, "Writer", 1);

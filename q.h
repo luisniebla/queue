@@ -30,6 +30,7 @@ struct TCB_t * NewItem() {
 void AddQueue(struct TCB_t *head, struct TCB_t * newItem){
   if (head == NULL || newItem == NULL) {
     printf("TRIED TO ADD NULL HEAD. You must've forgotten to initialize the head pointer\n");
+    exit(1);
     return;
   }
   if (head->next == NULL){

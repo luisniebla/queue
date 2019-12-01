@@ -14,6 +14,7 @@ void start_thread(void (*function) (void), int payload, char * output_string)
 }
 
 void run() {
+  printf("Running----\n");
   swapcontext(&parent, &(RunQ->next->context));
 }
 

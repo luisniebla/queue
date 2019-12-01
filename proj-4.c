@@ -8,7 +8,6 @@ struct TCB_t * touchedHistory;
 ucontext_t uctx_main;
 ucontext_t parent;
 struct sem * resource;
-// struct sem * mutex;
 int buffer;
 struct TCB_t * tcb_buff;
 int buff[5];
@@ -40,8 +39,10 @@ void rwlock_init(rwlock_t * lock) {
 void rwlock_acquire_readlock(rwlock_t *lock) {
     P(lock->lock);
     lock->readers++;
-    if (lock->readers == 1)
+    if (lock->readers == 1) {
+        printf("Locking writelock\n");
         P(lock->writelock);
+    }
     V(lock->lock);
 }
 
@@ -49,7 +50,7 @@ void rwlock_release_readlock(rwlock_t *lock) {
     P(lock->lock);
     lock->readers--;
     if (lock->readers == 0){
-        printf("realeasing writelock\n");
+        // printf("releasing writelock\n");
         V(lock->writelock);
     }
        
@@ -79,7 +80,7 @@ void writer() {
     printf("This is the %dth writer writing value i = %d\n", writerID, counter);
     yield();
     rwlock_release_writelock(&mutex);
-    yield();
+    // yield();
     printf("This is the %dth writer verifying value i = %d\n", writerID, counter);
     // return NULL;
     // yield();
@@ -90,12 +91,12 @@ void reader() {
     int i;
     int local = 0;
     int localReaderID = ++readerID;
-    // for (i = 0; i < 1; i++) {
     rwlock_acquire_readlock(&mutex);
     local = counter;
     printf("This is the %dth reader reading value i = %d for the first time\n", localReaderID, counter );
-    rwlock_release_readlock(&mutex);
     yield();
+    rwlock_release_readlock(&mutex);
+    
     local = counter;
     printf("This is the %dth reader reading value i = %d for the second time\n", localReaderID, counter );
 
@@ -118,11 +119,17 @@ int main() {
     rwlock_init(&mutex); 
     generate_threads(reader, 1, "Reader", 5);
     generate_threads(writer, 1, "Writer", 1);
-    generate_threads(reader, 6, "Reader", 4);
-    generate_threads(writer, 2, "Writer", 2);
-    generate_threads(reader, 11, "Reader", 5);
-    generate_threads(writer, 4, "Writer", 1);
-    generate_threads(reader, 17, "Reader", 3);
-
+    // getcontext(&parent);
+    // run();
+    // 
+    // printf("Printing Queue\n");
+    // PrintQueue(RunQ);
     run();
+    // generate_threads(reader, 6, "Reader", 4);
+    // generate_threads(writer, 2, "Writer", 2);
+    // generate_threads(reader, 11, "Reader", 5);
+    // generate_threads(writer, 4, "Writer", 1);
+    // generate_threads(reader, 17, "Reader", 3);
+
+    // run();
 }

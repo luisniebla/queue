@@ -20,21 +20,11 @@ void run() {
 int yield() {
   TCB_t * parent_child = RunQ->next;
   RotateQ(RunQ);
-  // printf("Hi\n");
-  // printf("We're going to swap from %d:%d to %d:%d\n", parent_child->payload, &(parent_child->context), RunQ->next->payload, &(RunQ->next->context));
   swapcontext(&(parent_child->context), &(RunQ->next->context));
-  
-  // PrintQueue(RunQ);
-  // printf("Swap Context Returned: %d\n", swapcontext(parent_child, &(RunQ->next->context)));
-  // if (parent_child == &(RunQ->next->context)) {
-  //   return;
-  // }else{
-  // }
-  
 }
 
+// For when you messed up the RunQ header and just need to go to the next context
 int yield_from(TCB_t * parent) {
-  // printf("=========Context Switch => Payload %d: %d > Payload %d: %d\n", parent->payload, &(parent->context), RunQ->next->payload, &(RunQ->next->context));
   swapcontext(&(parent->context), &(RunQ->next->context));
   
 }

@@ -111,10 +111,12 @@ struct TCB_t* DelQueue(struct TCB_t *head){
 void PrintQueue(TCB_t *head) {
   if (head != NULL && head->next != NULL) {
     struct TCB_t* temp = head->next;
-    printf("%s (%d) -> ", temp->identifier, &temp->context);
+    printf("%s -> ", temp->identifier);
+    // printf("%s (%d) -> ", temp->identifier, &temp->context); This was used during developer but it raises  gcc errors
     temp = temp->next;
     while(temp != head->next) {
-      printf("%s (%d) -> ", temp->identifier, &temp->context);
+      printf("%s -> ", temp->identifier);
+      // printf("%s (%d) -> ", temp->identifier, &temp->context);
       temp = temp->next;
     }
   

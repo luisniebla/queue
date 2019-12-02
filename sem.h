@@ -19,8 +19,7 @@ void InitSem(struct sem * S, int value, char str[]) {
 
 void PrintSem(struct sem * S) {
     
-printf("\n====S=======\n");
-    printf("|label: %s|\n", S->label);
+printf("\n====S: %s=======\n", S->label);
     printf("|value: %d  |\n", S->value);
     printf("|queue: ");
     PrintQueue(S->queue);
@@ -62,13 +61,17 @@ void P(struct sem * S) {
         // sleep(1);
         while (S->value < 0) {
             // printf("%s passes\n", RunQ->next->identifier);
-            // PrintSem(S);
+            // 
             // RotateQ(RunQ);
             // yield_from(newItem);
             // RotateQ(RunQ);
             // setcontext(&(RunQ->next->context));
             // sleep(1);
+            if(DEBUG) printf("Stuck in a P loop possibly\n");
+            if(DEBUG) PrintSem(S);
+            exit(1);
             yield();
+            
         }
     }
 }

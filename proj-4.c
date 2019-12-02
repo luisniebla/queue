@@ -5,6 +5,8 @@
 struct TCB_t * RunQ;
 struct TCB_t * touchedHistory;
 #define DEBUG 0
+#define DEBUG_SEM 0
+#define DEBUG_RUNQ 0
 ucontext_t uctx_main;
 ucontext_t parent;
 struct sem * resource;
@@ -48,6 +50,7 @@ void rwlock_acquire_readlock(rwlock_t *lock) {
     lock->readers++;
     if (lock->readers == 1) {
         if(DEBUG) printf("Locking writelock\n");
+        if(DEBUG_SEM) PrintSem(lock->writelock);
         P(lock->writelock);
     }
     V(lock->lock);
@@ -60,20 +63,28 @@ void rwlock_release_readlock(rwlock_t *lock) {
     if (DEBUG) printf("lock->readers: %d\n", lock->readers);
     if (lock->readers == 0){
         if(DEBUG) printf("**********releasing writelock\n");
-        V(lock->writelock);
+        // AddToEnd(RunQ, DelQueue(lock->writelock->queue));
+        // lock->writelock->value++;
+        while(lock->writelock->queue->next != NULL) {
+            V(lock->writelock);
+        }
     }
     V(lock->lock);
 }
 
 void rwlock_acquire_writelock(rwlock_t *lock) {
+    if (DEBUG) printf("Writer is acquiring lock\n");
     // Writer signifying it wants to write, preventing new readers from entering
     P(lock->readlock);
+    if (DEBUG) printf("Passed readlock barrier\n");
     P(lock->writelock);
 }
 
 void rwlock_release_writelock(rwlock_t *lock) {
+    if (DEBUG) printf("Writer is releasing writelock\n");
     V(lock->readlock);
     V(lock->writelock);
+    if(DEBUG_SEM) PrintSem(lock->writelock);
 }
 
 int out;
@@ -85,21 +96,21 @@ int counter = 0;
 
 void writer() {
     if(DEBUG) printf("====>Writer\n");
-    writerID++;
+    int localWriterID = ++writerID;
     int i;
     rwlock_acquire_writelock(&mutex);
     counter++;
-    printf("This is the %dth writer writing value i = %d\n", writerID, counter);
-    yield();
+    printf("This is the %dth writer writing value i = %d\n", localWriterID, counter);
+    // yield();
     rwlock_release_writelock(&mutex);
     // yield();
-    printf("This is the %dth writer verifying value i = %d\n", writerID, counter);
+    printf("This is the %dth writer verifying value i = %d\n", localWriterID, counter);
     // return NULL;
     // yield();
     rwlock_t *lock = &mutex;
     DelQueue(RunQ); // Delete this writer from the queue
     while(lock->readlock->queue->next != NULL){
-        if(DEBUG) PrintQueue(RunQ);
+        if(DEBUG_RUNQ) PrintQueue(RunQ);
         // We do this here instead of V() because it inserts the readers in the wrong order
         AddQueue(RunQ, DelQueue(lock->readlock->queue));
         lock->readlock->value++;
@@ -123,7 +134,7 @@ void reader() {
     local = counter;
     printf("This is the %dth reader reading value i = %d for the second time\n", localReaderID, counter );
     if(DEBUG) printf("Finished with this reader. What's next?\n");
-    if (DEBUG) PrintQueue(RunQ);
+    if (DEBUG_RUNQ) PrintQueue(RunQ);
     // return NULL;
     // getcontext(&(RunQ->next->context));
     
@@ -135,11 +146,10 @@ void reader() {
     //     DelQueue(RunQ);
     // }else{
     if (DEBUG) printf("Yielding is next\n");
-    if(DEBUG) PrintQueue(RunQ);
+    if(DEBUG_RUNQ) PrintQueue(RunQ);
     DelQueue(RunQ);
-    if (DEBUG) PrintQueue(RunQ);
+    if (DEBUG_RUNQ) PrintQueue(RunQ);
     yield_from(&parent);
-    
 }
 
 void generate_threads(void (*function) (void), int payload, char * str, int threads) 
@@ -158,6 +168,10 @@ int main() {
     generate_threads(reader, 1, "Reader", 5);
     generate_threads(writer, 1, "Writer", 1);
     generate_threads(reader, 6, "Reader", 4);
+    generate_threads(writer, 2, "Writer", 2);
+    generate_threads(reader, 11, "Reader", 5);
+    generate_threads(writer, 4, "Writer", 1);
+    generate_threads(reader, 17, "Reader", 3);
     // getcontext(&parent);
     // run();
     // 
@@ -165,10 +179,8 @@ int main() {
     // PrintQueue(RunQ);
     run();
     
-    // generate_threads(writer, 2, "Writer", 2);
-    // generate_threads(reader, 11, "Reader", 5);
-    // generate_threads(writer, 4, "Writer", 1);
-    // generate_threads(reader, 17, "Reader", 3);
+    // 
+    
 
     // run();
 }

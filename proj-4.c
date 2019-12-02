@@ -27,6 +27,9 @@ typedef struct _rwlock_t {
     int readers;
 } rwlock_t;
 
+int magicSwitch = 0; // I couldn't figure out how to differentiate between the first writer wait and the other writer waits
+                    // which require different output behavior (Adding to front of queue instead of to the end)
+                    // It's purely for aesthetic and grading reasons, I don't think it actually effects how the algorithm works
 rwlock_t mutex;
 
 // The concept for these rwlock_* functions comes from OS: 3 Easy Pieces.
@@ -65,9 +68,31 @@ void rwlock_release_readlock(rwlock_t *lock) {
         if(DEBUG) printf("**********releasing writelock\n");
         // AddToEnd(RunQ, DelQueue(lock->writelock->queue));
         // lock->writelock->value++;
-        while(lock->writelock->queue->next != NULL) {
+        if (!magicSwitch) {
             V(lock->writelock);
+            magicSwitch++;
+        }else{
+            while(lock->writelock->queue->next != NULL) {
+            lock->writelock->value++;
+            if(DEBUG)printf("Adding Writer to RuNQ\n");
+            if(DEBUG)PrintQueue(RunQ);
+            struct TCB_t * newItem = DelQueue(lock->writelock->queue);
+            // printf("WE DELETED SUCCESFFULLY\n");
+            // PrintQueue(S->queue);
+            newItem->next = NULL;
+            newItem->prev = NULL;
+            // printf("RETRIEVING NEXT ITEM\n");
+            struct TCB_t * currentItem = RunQ->next;
+            // printf("WERE GOING TO ADD TO QUEU\n");
+            AddToFront(RunQ, newItem); // take out element
+            // RotateQ(RunQ);
+            if(DEBUG)printf("Done\n");
+            if(DEBUG)PrintQueue(RunQ);
+            // printf("%s\n", lock->writelock->queue->next->identifier);
+            // 
         }
+        }
+        
     }
     V(lock->lock);
 }

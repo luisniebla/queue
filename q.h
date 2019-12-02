@@ -25,6 +25,29 @@ struct TCB_t * NewItem() {
 
 
 
+void AddToFront(struct TCB_t *head, struct TCB_t * newItem ) {
+  if (head == NULL || newItem == NULL) {
+    printf("TRIED TO ADD NULL HEAD. You must've forgotten to initialize the head pointer\n");
+    exit(1);
+    return;
+  }
+  if (head->next == NULL){
+    newItem->next = newItem;
+    newItem->prev = newItem;
+    newItem->payload = newItem->payload;
+    head->next = newItem;
+  }else{
+    struct TCB_t* prevSecond = head->next->next;
+    struct TCB_t* last = head->next->prev;
+    
+    head->next->next = newItem;
+    newItem->next = prevSecond;
+    prevSecond->prev = newItem;
+    newItem->prev = head->next;
+    newItem->payload = newItem->payload;
+  }
+
+}
 // Add the item queue to the top of the head queue
 // A double linked list doesn't use next at the end
 void AddQueue(struct TCB_t *head, struct TCB_t * newItem){

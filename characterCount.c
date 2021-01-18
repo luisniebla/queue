@@ -1,8 +1,5 @@
 #include <stdio.h>
 
-
-// TODO: Histogram of lengths of words and characters
-
 // Count the number of occurrences of each digit, whitespace, and all other characters
 int main() {
   int c, i, whitespace_count, char_count;

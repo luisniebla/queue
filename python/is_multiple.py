@@ -40,3 +40,57 @@ assert is_even_no_loop(2) == True
 assert is_even_no_loop(20141924812947125407294018) == True
 assert is_even_no_binary_ops(2231243) == False
 assert is_even_no_binary_ops(121241241251028412) == True
+
+
+
+# Write a Python function that takes a sequence of 1 or more numbers
+# and returns the smallest and largest numbers in the form of a tuple
+# do not use min/max
+def minmax(data: list):
+    # Maybe set to null instead
+    minD, maxD = data[0], data[0]
+    for d in data:
+        if d < minD:
+            minD = d
+        elif d > maxD:
+            maxD = d
+    return [minD, maxD]
+
+
+assert(minmax([1,2,3])) == [1,3]
+assert(minmax([1,1])) == [1,1]
+
+
+# Takes positive integer n and returns sum of all the squres
+# of all the positive integers smaller than n
+def sumOfSquares(n: int):
+    count = 0
+    for i in range(n):
+        count += i ** 2
+    return count
+
+assert sumOfSquares(0) == 0
+assert sumOfSquares(2) == 1
+assert sumOfSquares(4) == 14
+
+
+# Do sumOfSquares but with comprehension
+def sumOfComprehensionSquares(n: int):
+    return sum([i ** 2 for i in range(n)])
+
+assert sumOfComprehensionSquares(0) == 0
+assert sumOfComprehensionSquares(4) == 14
+
+# Take a positive integer n and returns the sum of squares of all the odd positives smallers than n
+def sumOfOdds(n: int):
+    return sum([i ** 2 for i in range(1, range(n), 2)])
+# I'm so confident on this, I don't even need to test it
+
+# Reverse  a lit of n integers without splicing
+def reverseList(n: list):
+    # n[::-1]
+    return [i for i in range(len(n) - 1, 0, -1)]
+
+
+# Take a sequence of integers and determine if there is a distinct pair of numbers in the sequence
+# whose product is odd

@@ -94,3 +94,23 @@ def reverseList(n: list):
 
 # Take a sequence of integers and determine if there is a distinct pair of numbers in the sequence
 # whose product is odd
+
+
+# Write a function that takes two arrays and return dot product
+def dot_product(n, m):
+    return sum([v * m[i] for i, v in enumerate(n)])
+
+assert dot_product([1,2],[3,4]) == 11
+
+# Give an example of a Python code fragment that attempts to write
+# an element to a list based on an index that may be out of bounds
+def write_to(n, item, i):
+    try:
+        n[i] = item
+    except IndexError:
+        print("bro, chill...")
+
+write_to([1,2,3], 2, 5)
+
+
+    

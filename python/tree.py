@@ -19,7 +19,7 @@ class Position:
 
     def __eq__(self, other):
         print(self.element, other)
-        return other.element == self.element
+        return getattr(other, 'element', other) == self.element
 
 class TreeNode:
     def __init__(self, val):
@@ -33,32 +33,44 @@ class TreeNode:
     def is_root(self, p):
         return self.root() == p
 
-    def parent(self, p):
-        print(p)
-        if (self.left and self.left.root() is p):
-            return self.root()
-        if (self.right and self.right.root() is p):
-            return self.root()
-        if (self.left and self.right):
-            return self.left.parent(p) or self.right.parent(p)
-        if (self.left):
-            return self.left.parent(p)
-        if (self.right):
-            return self.right.parent(p)
-        # if (self.left == p or self.right == p):
-        #     return self.p
-        # elif self.right 
-        #     return self.left.parent(p) or self.right.parent(p)
+    def parent(self, node):
+        if node is None:
+            return None
 
-    def printNode(self, node):
-        if (node):
-            return f' {node.val} {self.printNode(node.left)} {self.printNode(node.right)}'
-        return ''
+        if self.left is node or self.right is node:
+            return self
+        else:
+            left = self.left.parent(node) if self.left else None
+            right = self.right.parent(node) if self.right else None
+            return left or right
 
-    def __str__(self):
-        return self.printNode(self)
+    def parent_of_element(self, e):
+        if self.is_root(e):
+            return None
+        else:
+            left = getattr(self.left, 'p', False) == e
+            right = getattr(self.right, 'p', False) == e
+            print('LR', left, right)
+            if not left or not right:
+                left = self.left.parent_of_element(e) if self.left else None
+                right = self.right.parent_of_element(e) if self.right else None
+            if left or right:
+                return self
 
+    def element_count(self, e):
+        if self is None:
+            return 0
+        else:
+            leftSum = self.left.element_count(e) if self.left else 0
+            rightSum = self.right.element_count(e) if self.right else 0
+            if self.root().element == e:
+                print('Adding...')
+                return 1 + leftSum + rightSum
+            else:
+                print('nada', self.root().element, e)
+                return leftSum + rightSum
 
+    
 
 #      1
 #    /   \
@@ -74,10 +86,19 @@ T.left.right = TreeNode(4)
 T.right.left = TreeNode(4)
 T.right.right = TreeNode(3)
 
+
 assert T.left == T.left
 assert T.left != T.right
+
 assert T.is_root(T.root()) is True
-assert T.parent(T.left.left.p) == Position(2)
-assert T.parent(T.right.right.p) == Position(2)
-assert T.parent(T.left.right.p) == Position(2)
-assert T.parent(T.right.p) == Position(1)
+
+assert T.parent(T.left.left) == T.left
+assert T.parent(T.right.right) == T.right
+assert T.parent(T.left.right) == T.left
+assert T.parent(T.right) == T
+
+assert T.element_count(1) == 1
+assert T.element_count(2) == 2
+assert T.element_count(9) == 0
+
+print(T.parent_of_element(3))

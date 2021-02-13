@@ -32,6 +32,10 @@ class TreeNode:
     def root(self):
         return self.p
 
+    @property
+    def val(self):  # More convenience naming with leetcode
+        return self.p.element
+
     def is_root(self, p):
         return self.root() == p
 
@@ -86,6 +90,31 @@ class TreeNode:
         else:
             return False
 
+    # The lowest common ancestor is between two nodes p and q as the loest node in T that has
+    # both p and q as descendants
+    # Note: All node values are unique. p and q are guarnteed to exist
+    # Note that parameters are TreeNodes. Problem would be more difficult if they weren't travesable...
+    def lowest_common_ancestor(self, p: 'TreeNode', q: 'TreeNode'):
+        # Case 1: Ancestor is root, the descendants exist within left/right subtrees
+        # Case 2: One of the nodes is the ancestor of itself, and has node2 has descendant
+        if self.left.element_count(p.val) and self.left.element_count(q.val):
+            return self.left.lowest_common_ancestor(p, q)
+        elif self.right.element_count(p.val) and self.right.element_count(q.val):
+            return self.right.lowest_common_ancestor(p, q)
+        else:  # We are guaranteed that we are at the "lowest" ancestor
+            return self.val
+        # if p.element_count(q.val) == 1: # q is in subtree of p
+        #     return p.val
+        # elif q.element_count(p.val) == 1:   # p is in subtree of q
+        #     return q.val
+        # else:
+        #     if self.element_count(p.val) and self.element_count(q.val):
+        #         return self.val
+        #     else:
+        #         return self.left.lowest_common_ancestor(
+        #             p, q
+        #         ) or self.right.lowest_common_ancestor(p, q)
+
 
 def height(root):
     if root is None:
@@ -129,7 +158,6 @@ T.right.left = TreeNode(4)
 T.right.right = TreeNode(3)
 
 assert diameter(T) == 4
-
 
 assert T.left == T.left
 assert T.left != T.right

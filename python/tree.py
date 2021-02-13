@@ -72,6 +72,20 @@ class TreeNode:
                 # print('nada', self.root().element, e)
                 return leftSum + rightSum
 
+    def is_same_tree(self, otherTree):
+        if not self.root and not otherTree:
+            return True
+        elif not self.root and otherTree or self.root and not otherTree:
+            return False
+        elif (
+            self.root().element == otherTree.root().element
+            and self.left.is_same_tree(otherTree.left)
+            and self.right.is_same_tree(otherTree.right)
+        ):
+            return True
+        else:
+            return False
+
 
 def height(root):
     if root is None:
@@ -139,10 +153,11 @@ assert T.element_count(9) == 0
 #    / \
 #   4   5
 
-T = TreeNode(1)
-T.left = TreeNode(2)
-T.right = TreeNode(3)
-T.left.left = TreeNode(4)
-T.left.right = TreeNode(5)
+TT = TreeNode(1)
+TT.left = TreeNode(2)
+TT.right = TreeNode(3)
+TT.left.left = TreeNode(4)
+TT.left.right = TreeNode(5)
 
-assert diameter(T) == 3
+assert diameter(TT) == 3
+assert T.is_same_tree(TT) is False

@@ -103,17 +103,36 @@ class TreeNode:
             return self.right.lowest_common_ancestor(p, q)
         else:  # We are guaranteed that we are at the "lowest" ancestor
             return self.val
-        # if p.element_count(q.val) == 1: # q is in subtree of p
-        #     return p.val
-        # elif q.element_count(p.val) == 1:   # p is in subtree of q
-        #     return q.val
-        # else:
-        #     if self.element_count(p.val) and self.element_count(q.val):
-        #         return self.val
-        #     else:
-        #         return self.left.lowest_common_ancestor(
-        #             p, q
-        #         ) or self.right.lowest_common_ancestor(p, q)
+
+    def __str__(self):
+        return serialize(self)
+
+
+def serialize(root):
+    if root is None:
+        return 'None'
+    else:
+        return (
+            str(root.val) + "L->" + serialize(root.left) + "R->" + serialize(root.right)
+        )
+
+
+def deserialize(s):
+    def f(root):
+        nonlocal s
+        if len(s) == 0:
+            return None
+        a = s[0]
+        s = s[1:]
+        if a == 'None':
+            return None
+        else:
+            root = TreeNode(a)
+            root.left = f(root.left)
+            root.right = f(root.right)
+        return root
+
+    return f(root=None)
 
 
 def height(root):
@@ -136,13 +155,25 @@ def diameter(root):
     )
 
 
-# def diameterOfBinaryTree(self, root):
-# Here's the idea
-# diameter_root = diameter(left_tree) + diameter(right_tree) + 1 (root node)
-# diameter_non_root = max(diameter(left_tree), diameter(right_tree))
-# diameter = max(diameter_root, diameter_non_root)
+# Given preorder and inorder traversals, construct binary tree
+def build_tree(preorder, inorder):
+    # Start at the root. This comes from preorder traversal
+    if not inorder or not preorder or not inorder.count(preorder[0]):
+        return None
+    # The preorder traversal always touched the root first. Let's take it
+    root = TreeNode(preorder.pop(0))
+    # Where in the inorder traversal does the root land. We use this as
+    # the "mid" for the list
+    ind = inorder.index(root.val)
+
+    # The left tree contains all the left stuff from the current root
+    root.left = build_tree(preorder, inorder[:ind])
+    # The right tree contains all the right stuff from the current root
+    root.right = build_tree(preorder, inorder[ind:])
+    return root
 
 
+# Manual Testing
 #      1
 #    /   \
 #   2     2
@@ -173,7 +204,6 @@ assert T.element_count(1) == 1
 assert T.element_count(2) == 2
 assert T.element_count(9) == 0
 
-# print(T.parent_of_element(3))
 
 #       1
 #      / \
@@ -186,6 +216,7 @@ TT.left = TreeNode(2)
 TT.right = TreeNode(3)
 TT.left.left = TreeNode(4)
 TT.left.right = TreeNode(5)
+
 
 assert diameter(TT) == 3
 assert T.is_same_tree(TT) is False

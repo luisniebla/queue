@@ -1,4 +1,4 @@
-from .tree import TreeNode
+from .tree import TreeNode, build_tree
 
 
 # TODO: Create generator for trees
@@ -44,3 +44,14 @@ def test_lowest_common_ancestor():
 
     assert T.lowest_common_ancestor(T.left, T.right) == 3
     assert T.lowest_common_ancestor(T.left, T.left.right.right) == 5
+
+
+def test_build_tree():
+    T = build_tree([3, 9, 20, 15, 7], [9, 3, 15, 20, 7])
+    TT = TreeNode(3)
+    TT.left = TreeNode(9)
+    TT.right = TreeNode(20)
+    TT.right.left = TreeNode(15)
+    TT.right.right = TreeNode(7)
+
+    assert str(T) == str(TT)

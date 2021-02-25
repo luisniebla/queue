@@ -107,6 +107,27 @@ class TreeNode:
     def __str__(self):
         return serialize(self)
 
+    def serailize(self, root):
+        return (
+            'X'
+            if root is None
+            else f'{root.val},{self.serailize(root.left)},{self.serailize(root.right)}'
+        )
+
+    def kthSmallest(self, root, k: int) -> int:
+        return sorted(
+            [int(x) for x in self.serailize(root).replace(',X', '').split(',')]
+        )[k - 1]
+
+
+def treeList(root, myList=[]):
+    if not root:
+        return myList
+    myList.append(root.val)
+    treeList(root.left, myList)
+    treeList(root.right, myList)
+    return myList
+
 
 def serialize(root):
     if root is None:
@@ -188,6 +209,9 @@ T.left.right = TreeNode(4)
 T.right.left = TreeNode(4)
 T.right.right = TreeNode(3)
 
+print(treeList(T))
+assert T.kthSmallest(T, 1) == 1
+assert T.kthSmallest(T, 2) == 2
 assert diameter(T) == 4
 
 assert T.left == T.left

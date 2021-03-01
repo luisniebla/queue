@@ -194,6 +194,61 @@ def build_tree(preorder, inorder):
     return root
 
 
+def max_path_sum(root):
+    # Max path either includes the root or it doesn't
+    if not root:
+        return 0
+
+    maxSubTree = root.val
+
+    def subMaxTree(root):
+        nonlocal maxSubTree
+        if not root:
+            return 0
+
+        leftMaxPath = subMaxTree(root.left)
+        rightMaxPath = subMaxTree(root.right)
+
+        maxSubTree = max(
+            maxSubTree,
+            root.val + leftMaxPath + rightMaxPath,
+            root.val + leftMaxPath,
+            root.val + rightMaxPath,
+            root.val,
+        )
+        return max(root.val, root.val + leftMaxPath, root.val + rightMaxPath)
+
+    if subMaxTree(root) > maxSubTree:
+        return subMaxTree(root)
+    else:
+        return maxSubTree
+
+    # ans = root.val
+
+    # def dfs(node):
+    #     nonlocal ans
+    #     if not node:
+    #         return 0
+    #     else:
+    #         left = dfs(node.left)
+    #         right = dfs(node.right)
+    #         if node.val + left + right > ans:
+    #             ans = node.val + left + right
+    #         if node.val + left > ans:
+    #             ans = node.val + left
+    #         if node.val + right > ans:
+    #             ans = node.val + right
+    #         if node.val > ans:
+    #             ans = node.val
+    #         return max(node.val, node.val + left, node.val + right)
+
+    # max_path_using_root = dfs(root)
+    # if max_path_using_root > ans:
+    #     return max_path_using_root
+    # else:
+    #     return ans
+
+
 # Manual Testing
 #      1
 #    /   \

@@ -1,4 +1,4 @@
-from .tree import TreeNode, build_tree
+from .tree import TreeNode, build_tree, max_path_sum
 
 
 # TODO: Create generator for trees
@@ -55,3 +55,39 @@ def test_build_tree():
     TT.right.right = TreeNode(7)
 
     assert str(T) == str(TT)
+
+
+def test_max_path_sum():
+
+    T = TreeNode(-10)
+    T.left = TreeNode(9)
+    T.right = TreeNode(20)
+    T.right.left = TreeNode(15)
+    T.right.right = TreeNode(7)
+
+    assert max_path_sum(T) == 42
+
+    T = TreeNode(-3)
+    assert max_path_sum(T) == -3
+
+    T = TreeNode(2)
+    T.left = TreeNode(-1)
+    assert max_path_sum(T) == 2
+
+    T = TreeNode(1)
+    T.left = TreeNode(-2)
+    T.right = TreeNode(3)
+    assert max_path_sum(T) == 4
+
+    #        1
+    #     -2    -3
+    #   1   3 -2  -1
+    # -1
+    T = TreeNode(1)
+    T.left = TreeNode(-2)
+    T.right = TreeNode(-3)
+    T.left.left = TreeNode(1)
+    T.left.right = TreeNode(3)
+    T.right.left = TreeNode(-2)
+    T.left.left.left = TreeNode(-1)
+    assert max_path_sum(T) == 3

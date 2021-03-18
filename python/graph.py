@@ -1,14 +1,19 @@
 class Vertex:
-    __slots__ = '_element'
-
     def __init__(self, x):
         self._element = x
+        self.visited = False
 
     def element(self):
         return self._element
 
     def __hash__(self):
         return hash(id(self))
+
+    def is_visited(self):
+        self.visited
+
+    def visit(self):
+        self.visited = True
 
 
 class Edge:
@@ -53,14 +58,16 @@ class Graph:
     def vertex_count(self):
         return len(self._outgoing)
 
+    @property
     def vertices(self):
-        return self._outgoing.keys()
+        return list(self._outgoing.keys())
 
     def edge_count(self):
         total = sum(len(self._outgoing[v]) for v in self._outgoing)
 
         return total if self.is_directed() else total // 2
 
+    @property
     def edges(self):
         result = set()
         for m in self._outgoing.values():
@@ -72,19 +79,22 @@ class Graph:
 
     def degree(self, v, outgoing=True):
         adj = self._outgoing if outgoing else self._incoming
+        print('adj', adj)
         return len(adj[v])
 
     def incident_edges(self, v, outgoing=True):
         adj = self._outgoing if outgoing else self._incoming
+        if v not in adj:
+            raise Exception('Vertex does not exist in Graph')
         print('adjacent', adj)
         for edge in adj[v].values():
             yield edge
 
     def insert_vertex(self, x=None):
         v = Vertex(x)
-        self._outgoing[v] = {}
+        self._outgoing[x] = {}
         if self.is_directed():
-            self._incoming[v] = {}
+            self._incoming[x] = {}
         return v
 
     def insert_edge(self, u, v, x=None):
@@ -96,18 +106,19 @@ class Graph:
 
 
 G = Graph(False)
-v1 = G.insert_vertex(1)
-v2 = G.insert_vertex(2)
-G.insert_edge(v1, v2)
+G.insert_vertex(1)
+G.insert_vertex(2)
+G.insert_edge(1, 2)
+
+print([str(x) for x in G.edges])
+print(G.vertices)
+
+visited = []
 
 
-def depth_first_search(G, u):
-    print(G.incident_edges(u))
-    for e in G.incident_edges(u):
-        print(e.endpoints())
-
-
-depth_first_search(G, 4)
+# s - the source vertex
+def breadth_first_search(G, s):
+    for v in 
 
 
 # class UndirectedGraph(Graph):
@@ -145,3 +156,25 @@ depth_first_search(G, 4)
 #                     discovered[v] = e
 #                     next_level.append(v)
 #         level = next_level
+
+
+# Given mxn 2D binary grid. 1 represents land, 0 represents water
+# Return the number of islands
+# Islands only formed by 1 directly above, below, left or right 1
+# This question is basically asking you to make an adjcancey list
+def numberOfIslands(grid):
+    adjList = {}
+    for i in len(grid):
+        adjList[i] = {}
+
+    for i in len(grid):
+        for j in len(grid[i]):
+            adjList[i][j] = grid[i][j]
+
+
+grid = [
+    ["1", "1", "1", "1", "0"],
+    ["1", "1", "0", "1", "0"],
+    ["1", "1", "0", "0", "0"],
+    ["0", "0", "0", "0", "0"],
+]

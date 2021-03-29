@@ -94,7 +94,24 @@ def reverseList(n: list):
 
 # Take a sequence of integers and determine if there is a distinct pair of numbers in the sequence
 # whose product is odd
+def hasOddProduct(n: list):
+    return len([x for x in n if x != 1 and x % 2 == 1]) > 0
+    # BAD: Don't do this
+    # for i in range(len(n)):
+    #     for j in range(len(n)):
+    #         if i != j and n[i] * n[j] % 2 == 1:
+    #             return True
+    # return False
 
+assert hasOddProduct([1,2,3]) == True
+assert hasOddProduct([1,2,4,6]) == False
+
+# Are all numbers different from each other
+def is_distinct(n: list):
+    for i in n:
+        if n.count(i) > 1:
+            return False
+    return True
 
 # Write a function that takes two arrays and return dot product
 def dot_product(n, m):
@@ -112,5 +129,10 @@ def write_to(n, item, i):
 
 write_to([1,2,3], 2, 5)
 
+import random
 
-    
+def my_choice(data):
+    return data[random.randrange(1, len(data))]
+
+data = [1,3,5,3,21,5,9,42]
+print(list(my_choice(data) for _ in data))

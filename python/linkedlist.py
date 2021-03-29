@@ -44,7 +44,66 @@ def revere_list_recursive(head: ListNode):
     return reversedHead
 
 
+def has_cycle(head: ListNode):
+    pos = head
+    while (pos != None):
+        temp = pos.next
+        startingPoint = pos.next
+        while (temp is not None and temp != pos):
+            print('yo', startingPoint.val, temp.val)
+            if temp.val == pos.val:
+                return True
+            else:
+                temp = temp.next
+                if (startingPoint == temp):
+                    return True
+        pos = pos.next
+    return False
 
-print(L)
-rovo = reverseList(L)
-print(rovo)
+def remove(head, n):
+    items = []
+    while (head):
+        items.append(head)
+        head = head.next
+    print()
+    if n == 1 and len(items) == 1:
+        items[0] = None
+    elif n == 1:
+        items[-n-1].next = None
+    elif len(items) == n:
+        return items[1]
+    else:
+        items[-n-1].next = items[-n+1]
+    return items[0]
+
+def reorderList(head: ListNode) -> None:
+    """
+    Do not return anything, modify head in-place instead.
+    """
+    print('Reordering', head)
+    items = []
+    while head:
+        items.append(head)
+        head = head.next
+    if len(items) == 2:
+        return items[0]
+    if len(items) > 1:
+        items[0].next = items[-1]
+        items[-2].next = None
+        if (items[0].next):
+            items[0].next.next = reorderList(items[1])
+    return items[0]
+        
+
+A = ListNode(1)
+A.next = ListNode(2)
+A.next.next = ListNode(3)
+A.next.next.next = ListNode(4)
+# A.next.next.next.next = ListNode(5)
+
+print(reorderList(A))
+print(A)
+# print(has_cycle(A))
+# print(L)
+# rovo = reverseList(L)
+# print(rovo)

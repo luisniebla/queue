@@ -99,6 +99,8 @@ A = ListNode(1)
 A.next = ListNode(2)
 A.next.next = ListNode(3)
 A.next.next.next = ListNode(4)
+for i in range(100):
+
 # A.next.next.next.next = ListNode(5)
 
 print(reorderList(A))

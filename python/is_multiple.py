@@ -136,3 +136,4 @@ def my_choice(data):
 
 data = [1,3,5,3,21,5,9,42]
 print(list(my_choice(data) for _ in data))
+

@@ -1,0 +1,19 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: pie-counter
+spec:
+  concurrencyPolicy: Allow
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: pie-counter
+              image: alpine
+              command:
+                - "sh"
+                - "-c"
+                - "echo 'scale=1000; 4*a(1)' | bc -l;sleep 2;"

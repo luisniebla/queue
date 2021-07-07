@@ -1,0 +1,1 @@
+ifSt x = (if x / 2 == 1 then x else x * 2) + 1

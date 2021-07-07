@@ -17,3 +17,4 @@ spec:
                 - "sh"
                 - "-c"
                 - "echo 'scale=1000; 4*a(1)' | bc -l;sleep 2;"
+# kubectl create -f k8s/pie-counter.cronjob.yaml

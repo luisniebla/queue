@@ -102,7 +102,6 @@ A.next.next.next = ListNode(4)
 for i in range(100):
 
 # A.next.next.next.next = ListNode(5)
-
 print(reorderList(A))
 print(A)
 # print(has_cycle(A))
